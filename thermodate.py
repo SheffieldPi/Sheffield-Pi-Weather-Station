@@ -74,9 +74,9 @@ while True:
     f.write('%s %7s *C %14s Pa\n %26s *F %13.2f inch Hg\n' % (Timenow,temp,pressure,Temp,Pres))
     #Prepare the code to run indefinitely or until required number of readings is reached
     if n != "n":
-        X += 1
-    if X >= float(n):
-            break
+            X += 1
+            if X >= float(n):
+                break
     f.close
     try:
         time.sleep(frequency)
