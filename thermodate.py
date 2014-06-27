@@ -49,6 +49,7 @@ my_fig = Figure(data = my_data,layout = my_layout)
 unique_url = py.plot(my_fig,filename='PiPlottesting')
 s=py.Stream(my_stream_id)
 
+print "Press ctrl-C to cancel the process"
 
 while True:
     s.open()
@@ -70,6 +71,7 @@ while True:
         print "Connection is ok, data has been uploaded to site %s" % Siteid
     else:
         print "Error connecting to site. Data was not uploaded at this time."
+    #Write the values to s (for plot.ly which will be uploaded) and f (for the file that will be saved)
     s.write(dict(x=Timenow,y=temp))
     f.write('%s %7s *C %14s Pa\n %26s *F %13.2f inch Hg\n' % (Timenow,temp,pressure,Temp,Pres))
     #Prepare the code to run indefinitely or until required number of readings is reached
@@ -77,6 +79,7 @@ while True:
             X += 1
             if X >= float(n):
                 break
+    #Close the file to preserve changes
     f.close
     try:
         time.sleep(frequency)
