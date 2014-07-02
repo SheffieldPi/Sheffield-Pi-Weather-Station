@@ -36,7 +36,7 @@ n = raw_input("Would you like to stop after a certain amount of readings? If so,
 if float(n)>1 or n == "n":
 	frequency = input('What time period between readings (in seconds) would you like: ')
 
-#This allows user to input their WOW details
+#This allows user to input their WOW details and also checks if those details are integers as expected
 def wowdetails():
 	while True:
 		SiteID = raw_input("What is your Weather Observations Website Site Id? ")
@@ -96,6 +96,7 @@ while True:
                 break
     #Close the file to preserve changes
     f.close
+    #Wait for the required time period before repeating
     try:
         time.sleep(frequency)
     except:
