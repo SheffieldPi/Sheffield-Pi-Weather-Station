@@ -39,10 +39,12 @@ if float(n)>1 or n == "n":
 #This allows user to input their WOW details
 def wowdetails():
 	while True:
-		SiteID = raw_input("What is your Weather Observations Website Site Id? "); AWSKey = raw_input("What is your Weather Observations Site AWS Key? ")
-		if SiteID == float(SiteID) and AWSKey == float(AWSKey):
+		SiteID = raw_input("What is your Weather Observations Website Site Id? ")
+		AWSKey = raw_input("What is your Weather Observations Site AWS Key? ")
+		try:
+			float(SiteID) and float(AWSKey):
 			return SiteID, AWSKey
-		else:
+		except:
 			print "Unknown intput, please try again."
 			continue
 				
