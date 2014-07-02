@@ -28,16 +28,31 @@ def Timeformatting(aTime):
     return Timeformat,Timenow
 
 
+
 sensor = BMP085.BMP085()
 Temperature = []; Pressure = []; Time = []; X = 0
-n = raw_input("Would you like to stop after a certain amount of readings? If so, type the amount. If not, type 'n': ")
-frequency = input('What time period between readings (in seconds) would you like: ')
-Siteid = 878216001; Key = 654789
 softwaretype = "Sheffield-Pi-Weather-Station-0.1"
+n = raw_input("Would you like to stop after a certain amount of readings? If so, type the amount. If not, type 'n': ")
+if float(n)>1 or n == "n":
+	frequency = input('What time period between readings (in seconds) would you like: ')
 
+#This allows user to input their WOW details
+def wowdetails():
+	while True:
+		SiteID = raw_input("What is your Weather Observations Website Site Id? "); AWSKey = raw_input("What is your Weather Observations Site AWS Key? ")
+		if float(SiteID) == True and float(AWSKey) == True:
+			Siteid = SiteID, Key = AWSKey
+			return Siteid,Key
+			break
+		else:
+			print "Unknown intput, please try again."
+			continue
+				
+
+[Siteid,Key] = wowdetails()
 
 #These format the plot.ly graph
-my_stream_id = "o8pp3tvslu"
+my_stream_id = rawinput("What is your Plot.ly stream ID? ")
 my_stream = Stream(token = my_stream_id,
                    maxpoints=80)
 my_data = Data([Scatter(x=[],
@@ -46,10 +61,10 @@ my_data = Data([Scatter(x=[],
                         stream = my_stream)])
 my_layout = Layout(title='Temperature Readings from SheffieldPiStation')
 my_fig = Figure(data = my_data,layout = my_layout)
-unique_url = py.plot(my_fig,filename='PiPlottesting')
+unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station')
 s=py.Stream(my_stream_id)
 
-print "Press ctrl-C to cancel the process"
+print "Press ctrl-C at any time to cancel the process"
 
 while True:
     s.open()
