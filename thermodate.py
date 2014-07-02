@@ -40,10 +40,8 @@ if float(n)>1 or n == "n":
 def wowdetails():
 	while True:
 		SiteID = raw_input("What is your Weather Observations Website Site Id? "); AWSKey = raw_input("What is your Weather Observations Site AWS Key? ")
-		if float(SiteID) == True and float(AWSKey) == True:
-			Siteid = SiteID, Key = AWSKey
-			return Siteid,Key
-			break
+		if SiteID == float(SiteID) and AWSKey == float(AWSKey):
+			return SiteID, AWSKey
 		else:
 			print "Unknown intput, please try again."
 			continue
