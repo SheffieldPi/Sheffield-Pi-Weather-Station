@@ -49,17 +49,20 @@ def wowdetails():
 			continue
 				
 
-[Siteid,Key] = wowdetails()
+[SiteID,Key] = wowdetails()
 
 #These format the plot.ly graph
-my_stream_id = rawinput("What is your Plot.ly stream ID? ")
+my_stream_id = raw_input("What is your Plot.ly stream ID? ")
 my_stream = Stream(token = my_stream_id,
                    maxpoints=80)
 my_data = Data([Scatter(x=[],
                         y=[],
                         mode = 'lines+markers',
-                        stream = my_stream)])
-my_layout = Layout(title='Temperature Readings from SheffieldPiStation')
+                        stream = my_stream,
+                        name = 'Temperature Readings *C')])
+my_layout = Layout(title='Temperature Readings from SheffieldPiStation',
+                    xaxis={'title':'Date and Time'},
+                    yaxis={'title':'Temperature, *C'})
 my_fig = Figure(data = my_data,layout = my_layout)
 unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station')
 s=py.Stream(my_stream_id)
@@ -73,17 +76,16 @@ while True:
     temp= format(sensor.read_temperature())
     pressure = format(sensor.read_pressure())
     [Timeformat,Timenow] = Timeformatting(time.gmtime())
-    print temp,pressure,Timenow
     #Get the data in the right units to upload
     Temp = tempfarenheit(temp)
     Pres = presinches(pressure)
     #Construct the URL to send the data to WOW
-    url = 'http://wow.metoffice.gov.uk/automaticreading?siteid=%s&siteAuthenticationKey=%s&dateutc=%s&tempf=%s&baromin=%.2f&softwaretype=%s' % (Siteid,Key,Timeformat,Temp,Pres,softwaretype)
+    url = 'http://wow.metoffice.gov.uk/automaticreading?siteid=%s&siteAuthenticationKey=%s&dateutc=%s&tempf=%s&baromin=%.2f&softwaretype=%s' % (SiteID,Key,Timeformat,Temp,Pres,softwaretype)
     #Send the request to WOW and interpret response
     request = urllib2.Request(url)
     response = urllib2.urlopen(request).getcode()
-    if response == '200':
-        print "Connection is ok, data has been uploaded to site %s" % Siteid
+    if float(response) == 200:
+        print "Connection is ok, data has been uploaded to site %s" % SiteID
     else:
         print "Error connecting to site. Data was not uploaded at this time."
     #Write the values to s (for plot.ly which will be uploaded) and f (for the file that will be saved)
