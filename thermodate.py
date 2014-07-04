@@ -42,10 +42,10 @@ def wowdetails():
 		SiteID = raw_input("What is your Weather Observations Website Site Id? ")
 		AWSKey = raw_input("What is your Weather Observations Site AWS Key? ")
 		try:
-			float(SiteID) and float(AWSKey):
+			float(SiteID) and float(AWSKey)
 			return SiteID, AWSKey
 		except:
-			print "Unknown intput, please try again."
+			print "Unknown input, please try again."
 			continue
 				
 
