@@ -51,9 +51,9 @@ for section in [ 'MetWOW', 'Plotly' ]:
 parser.write(open('details.ini','w'))
 
 #This assigns the values to a format that the code can now access
-AWSKey = parser.get('MetWOW','AWSKey')
-SiteID = parser.get('MetWOW','SiteID')
-APIKey = parser.get('Plotly','APIKey')
+AWSKey = parser.get('MetWOW','AWS_Key')
+SiteID = parser.get('MetWOW','Site_ID')
+APIKey = parser.get('Plotly','API_Key')
 Stream_ID = parser.get('Plotly','Stream_ID')
 Username = parser.get('Plotly','Username')
 
