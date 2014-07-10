@@ -84,9 +84,6 @@ s=py.Stream(Stream_ID)
 print "Press ctrl-C at any time to cancel the process"
 
 while True:
-    s.open()
-    f = open("data.txt",'a')
-
     #Read the data
     temp= format(sensor.read_temperature())
     pressure = format(sensor.read_pressure())
@@ -95,6 +92,7 @@ while True:
     #Get the data in the right units to upload
     Temp = tempfarenheit(temp)
     Pres = presinches(pressure)
+    
     #Construct the URL to send the data to WOW
     url = 'http://wow.metoffice.gov.uk/automaticreading?siteid=%s&siteAuthenticationKey=%s&dateutc=%s&tempf=%s&baromin=%.2f&softwaretype=%s' % (SiteID,AWSKey,Timeformat,Temp,Pres,softwaretype)
 
@@ -106,18 +104,20 @@ while True:
     else:
         print "Error connecting to WOW site. Data was not uploaded at this time."
 
-    #Write the values to s (for plot.ly which will be uploaded) and f (for the file that will be saved)
+    #Open the Plot.ly stream (s) and write the values to be uploaded
+    s.open()
     s.write(dict(x=Timenow,y=temp))
+    
+    #Write the values to a saved file and then close that file
+    f = open("data.txt",'a')
     f.write('%s %7s *C %14s Pa\n %26s *F %13.2f inch Hg\n' % (Timenow,temp,pressure,Temp,Pres))
-
+    f.close
+    
     #Prepare the code to run indefinitely or until required number of readings is reached
     if n != "n":
             X += 1
             if X >= float(n):
                 break
-
-    #Close the file to preserve changes
-    f.close
 
     #Wait for the required time period before repeating
     try:
