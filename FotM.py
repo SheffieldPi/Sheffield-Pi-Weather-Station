@@ -68,7 +68,7 @@ elif 15 <= float(temp) < 25:
 elif float(temp) >=30:
     print "That's very warm. Are you warming it up with your hand? Don't try to trick me!"
 else:
-    print "Pretty chilly where you are!"
+    print "It's pretty chilly where you are!"
 #Get the data in the right units to upload
 Temp = tempfarenheit(temp)
 Pres = presinches(pressure)
