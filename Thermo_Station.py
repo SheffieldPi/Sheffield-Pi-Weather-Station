@@ -33,10 +33,10 @@ def Timeformatting(aTime):
 
 def addvalue():
     #This is in case the login values have not been added already
-    value = raw_input('What is your %s?' %name)
+    value = raw_input('What is your %s?  ' %name)
     parser.set(section,name,value)
 
-#This checks that 
+#This checks that user details exist and prompts for them if not
 parser = SafeConfigParser()
 parser.read('details.ini')
 
@@ -51,12 +51,11 @@ for section in [ 'MetWOW', 'Plotly' ]:
 parser.write(open('details.ini','w'))
 
 #This assigns the values to a format that the code can now access
-AWSKey = parser.get('MetWOW','AWS_Key')
-SiteID = parser.get('MetWOW','Site_ID')
-APIKey = parser.get('Plotly','API_Key')
-Stream_ID = parser.get('Plotly','Stream_ID')
-Username = parser.get('Plotly','Username')
-
+AWSKey = parser.get('MetWOW','aws_key')
+SiteID = parser.get('MetWOW','site_id')
+APIKey = parser.get('Plotly','api_key')
+Stream_ID = parser.get('Plotly','stream_id')
+Username = parser.get('Plotly','username')
 
 sensor = BMP085.BMP085()
 X = 0
@@ -75,10 +74,10 @@ my_data = Data([Scatter(x=[],
                         stream = my_stream,
                         name = 'Temperature Readings *C')])
 my_layout = Layout(title='Temperature Readings from SheffieldPiStation',
-                    xaxis={'title':'Date and Time'},
+                    xaxis={'title':'Date and Time, GMT'},
                     yaxis={'title':'Temperature, *C'})
 my_fig = Figure(data = my_data,layout = my_layout)
-unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station')
+unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station',auto_open=False)
 s=py.Stream(Stream_ID)
 
 print "Press ctrl-C at any time to cancel the process"
@@ -107,7 +106,8 @@ while True:
     #Open the Plot.ly stream (s) and write the values to be uploaded
     s.open()
     s.write(dict(x=Timenow,y=temp))
-    
+    s.close()
+
     #Write the values to a saved file and then close that file
     f = open("data.txt",'a')
     f.write('%s %7s *C %14s Pa\n %26s *F %13.2f inch Hg\n' % (Timenow,temp,pressure,Temp,Pres))
