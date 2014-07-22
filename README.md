@@ -14,6 +14,6 @@ The file Thermo_Station.py is the full code which will upload the data to the We
 
 The file FotM.py is a reduced-function version of the code that will only upload data to WOW and print it on screen. It is intended to be used as an activity at the Festival of the Mind in Sheffield
 
-The files beginning with Autorun_"Station are created to run the weather station at start up without user input. Please visit http://sheffieldpistation.wordpress.com/auto-running-the-weather-station-at-startup/ to set the automatic station up.
+The files beginning with "Autorun_Station" are created to run the weather station at start up without user input. Please visit http://sheffieldpistation.wordpress.com/auto-running-the-weather-station-at-startup/ to set the automatic station up.
 
 For more information on setting up the Raspberry Pi Weather Station, including a how-to guide with the programs needed to install, visit http://sheffieldpistation.wordpress.com/
