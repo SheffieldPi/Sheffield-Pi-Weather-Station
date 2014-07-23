@@ -37,6 +37,7 @@ def plotpressure():
         if check == "y":
             value = raw_input('What is your %s?  ' %name)
             parser.set(section,name,value)
+            return
         elif check == "n":
             Stream_ID_2 = False
             return Stream_ID_2
