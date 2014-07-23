@@ -76,7 +76,8 @@ Stream_ID = parser.get('Plotly','stream_id')
 Username = parser.get('Plotly','username')
 try:
     Stream_ID_2 = parser.get('Plotly','stream_id_2')
-except: pass
+except: 
+    pass
 
 sensor = BMP085.BMP085()
 softwaretype = "Sheffield-Pi-Weather-Station-0.1"
