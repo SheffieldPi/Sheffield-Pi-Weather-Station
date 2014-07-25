@@ -30,21 +30,6 @@ def Timeformatting(aTime):
     Timenow = time.strftime('%Y-%m-%d %H:%M:%S',aTime)
     Timeformat = Timenow.replace(':','%3A').replace(' ','+')
     return Timeformat,Timenow
-
-def plotpressure():
-    while True:
-        check = raw_input("would you like to stream pressure to Plot.ly? y/n: ")
-        if check == "y":
-            value = raw_input('What is your %s?  ' %name)
-            parser.set(section,name,value)
-            return
-        elif check == "n":
-            Stream_ID_2 = False
-            return Stream_ID_2
-        else:
-            print "Sorry, invalid input."
-            plotpressure();
-            return
             
 def addvalue():
     #This is in case the login values have not been added already
@@ -55,39 +40,45 @@ def addvalue():
         value = raw_input('What is your %s?  ' %name)
         parser.set(section,name,value)
 
-def TemPlot():
-    #Formats the temperature Plot.ly graph
-    my_stream = Stream(token = Stream_ID,
-                       maxpoints=80)
-    my_data = Data([Scatter(x=[],
-                            y=[],
-                            mode = 'lines+markers',
-                            stream = my_stream,
-                            name = 'Temperature Readings *C')])
-    my_layout = Layout(title='Temperature Readings from SheffieldPiStation',
-                        xaxis={'title':'Date and Time, GMT'},
-                        yaxis={'title':'Temperature, *C'})
+def Plotter():
+    trace1 = Scatter(
+    x=[],
+    y=[],
+    name = 'Temperature Readings *C',
+    stream = Stream(token = Stream_ID,
+        maxpoints=80)
+    )
+    trace2 = Scatter(
+    x=[],
+    y=[],
+    name = 'Pressure Readings Pa',
+    yaxis = 'y2',
+    stream = Stream(token = Stream_ID_2,
+        maxpoints=80)
+    )
+    my_data = Data([trace1, trace2])
+    my_layout = Layout(
+        title='Temperature Readings from SheffieldPiStation',
+        xaxis={'title':'Date and Time, GMT'},
+        yaxis=YAxis(title='Temperature, *C',
+                    range = [23,25]
+        ),
+        yaxis2=YAxis(
+            title = 'Pressure, Pa',
+            range = [100500,100600],
+            titlefont={'color':'rgb(148,103,189'},
+            tickfont=Font(
+                color='rgb(148,103,189)'
+            ),
+            side = 'right',
+            overlaying = 'y'
+        )
+    )
     my_fig = Figure(data = my_data,layout = my_layout)
-    unique_url = py.plot(my_fig,filename='Temperature Data from the Pi Weather Station',auto_open=False)
+    unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station',auto_open=False,fileopt='extend')
     s = py.Stream(Stream_ID)
-    return s
-
-def PresPlot():
-    #Formats the pressure Plot.ly graph
-    my_stream = Stream(token = Stream_ID_2,
-                       maxpoints=80)
-    my_data = Data([Scatter(x=[],
-                            y=[],
-                            mode = 'lines+markers',
-                            stream = my_stream,
-                            name = 'Pressure Readings Pa')])
-    my_layout = Layout(title='Pressure Readings from SheffieldPiStation',
-                        xaxis={'title':'Date and Time, GMT'},
-                        yaxis={'title':'Pressure, Pa'})
-    my_fig = Figure(data = my_data,layout = my_layout)
-    unique_url = py.plot(my_fig,filename='Pressure Data from the Pi Weather Station',auto_open=False)
     q = py.Stream(Stream_ID_2)
-    return q
+    return s,q
 
 #This checks that user details exist and prompts for them if not
 parser = ConfigParser.SafeConfigParser(allow_no_value=True)
@@ -96,10 +87,9 @@ parser.read('details.ini')
 for section in [ 'MetWOW', 'Plotly' ]:
     for name,value in parser.items(section):
         if value:
-            Stream_ID_2 = True
             continue
         else:
-            Stream_ID_2 = addvalue()
+            addvalue()
 
 #This writes the inputted values (if any) to the file
 parser.write(open('details.ini','w'))
@@ -110,8 +100,7 @@ SiteID = parser.get('MetWOW','site_id')
 APIKey = parser.get('Plotly','api_key')
 Stream_ID = parser.get('Plotly','stream_id')
 Username = parser.get('Plotly','username')
-if Stream_ID_2 != False:
-    Stream_ID_2 = parser.get('Plotly','stream_id_2')
+Stream_ID_2 = parser.get('Plotly','stream_id_2')
 
 sensor = BMP085.BMP085()
 X = 0
@@ -122,10 +111,9 @@ if float(n)>1 or n == "n":
 
 #Use the functions to format the plot.ly graph and login to the site
 py.sign_in(Username,APIKey)
-s = TemPlot()
-if Stream_ID_2:
-    q = PresPlot()
-
+s,q = Plotter()
+s.open()
+q.open()
 print "Press ctrl-C at any time to cancel the process"
 
 while True:
@@ -149,16 +137,9 @@ while True:
     else:
         print "Error connecting to WOW site. Data was not uploaded at this time."
 
-    #Open the Plot.ly temperature stream (s) and write the values to be uploaded
-    s.open()
+    #Write the values to the Plot.ly data stream
     s.write(dict(x=Timenow,y=temp))
-    s.close()
-
-    #Open the Plot.ly pressure stream (q) and write the values to be uploaded if there is a stream ID
-    if Stream_ID_2:
-        q.open()
-        q.write(dict(x=Timenow,y=pressure))
-        q.close()
+    q.write(dict(x=Timenow,y=pressure))
 
     #Write the values to a saved file and then close that file
     f = open("data.txt",'a')
@@ -169,6 +150,8 @@ while True:
     if n != "n":
             X += 1
             if X >= float(n):
+                s.close()
+                q.close()
                 break
 
     #Wait for the required time period before repeating
@@ -176,5 +159,7 @@ while True:
         time.sleep(frequency)
     except:
         print "Process was terminated"
+        s.close()
+        q.close()
         break
 
