@@ -32,37 +32,45 @@ def Timeformatting(aTime):
     Timeformat = Timenow.replace(':','%3A').replace(' ','+')
     return Timeformat,Timenow
 
-def TemPlot():
-    my_stream = Stream(token = Stream_ID,
-                       maxpoints=80)
-    my_data = Data([Scatter(x=[],
-                            y=[],
-                            mode = 'lines+markers',
-                            stream = my_stream,
-                            name = 'Temperature Readings *C')])
-    my_layout = Layout(title='Temperature Readings from SheffieldPiStation',
-                        xaxis={'title':'Date and Time, GMT'},
-                        yaxis={'title':'Temperature, *C'})
+def Plotter():
+    trace1 = Scatter(
+    x=[],
+    y=[],
+    name = 'Temperature Readings *C',
+    stream = Stream(token = Stream_ID,
+        maxpoints=80)
+    )
+    trace2 = Scatter(
+    x=[],
+    y=[],
+    name = 'Pressure Readings Pa',
+    yaxis = 'y2',
+    stream = Stream(token = Stream_ID_2,
+        maxpoints=80)
+    )
+    my_data = Data([trace1, trace2])
+    my_layout = Layout(
+        title='Temperature Readings from SheffieldPiStation',
+        xaxis={'title':'Date and Time, GMT'},
+        yaxis=YAxis(title='Temperature, *C',
+                    range = [23,25]
+        ),
+        yaxis2=YAxis(
+            title = 'Pressure, Pa',
+            range = [100500,100600],
+            titlefont={'color':'rgb(148,103,189'},
+            tickfont=Font(
+                color='rgb(148,103,189)'
+            ),
+            side = 'right',
+            overlaying = 'y'
+        )
+    )
     my_fig = Figure(data = my_data,layout = my_layout)
-    unique_url = py.plot(my_fig,filename='Temperature Data from the Pi Weather Station',auto_open=False)
+    unique_url = py.plot(my_fig,filename='Weather Data from the Pi Weather Station',auto_open=False,fileopt='extend')
     s = py.Stream(Stream_ID)
-    return s
-
-def PresPlot():
-    my_stream = Stream(token = Stream_ID_2,
-                       maxpoints=80)
-    my_data = Data([Scatter(x=[],
-                            y=[],
-                            mode = 'lines+markers',
-                            stream = my_stream,
-                            name = 'Pressure Readings Pa')])
-    my_layout = Layout(title='Pressure Readings from SheffieldPiStation',
-                        xaxis={'title':'Date and Time, GMT'},
-                        yaxis={'title':'Pressure, Pa'})
-    my_fig = Figure(data = my_data,layout = my_layout)
-    unique_url = py.plot(my_fig,filename='Pressure Data from the Pi Weather Station',auto_open=False)
     q = py.Stream(Stream_ID_2)
-    return q
+    return s,q
 
 #This checks the user details
 parser = SafeConfigParser()
@@ -76,7 +84,7 @@ Stream_ID = parser.get('Plotly','stream_id')
 Username = parser.get('Plotly','username')
 try:
     Stream_ID_2 = parser.get('Plotly','stream_id_2')
-except: 
+except:
     pass
 
 sensor = BMP085.BMP085()
@@ -85,9 +93,9 @@ frequency = 900
 
 #These format the plot.ly graph and login to the site
 py.sign_in(Username,APIKey)
-s = TemPlot()
-if Stream_ID_2:
-    q = PresPlot()
+s,q = Plotter()
+s.open()
+q.open()
 
 while True:
     #Read the data
@@ -107,15 +115,8 @@ while True:
     response = urllib2.urlopen(request).getcode()
 
     #Open the Plot.ly temperature stream (s) and write the values to be uploaded
-    s.open()
     s.write(dict(x=Timenow,y=temp))
-    s.close()
-
-    #Open the Plot.ly pressure stream (q) and write the values to be uploaded
-    if Stream_ID_2:
-        q.open()
-        q.write(dict(x=Timenow,y=pressure))
-        q.close()
+    q.write(dict(x=Timenow,y=pressure))
 
     #Write the values to a saved file and then close that file
     f = open("data.txt",'a')
@@ -126,4 +127,6 @@ while True:
     try:
         time.sleep(frequency)
     except:
+        s.close()
+        q.close()
         break
