@@ -33,12 +33,8 @@ def Timeformatting(aTime):
             
 def addvalue():
     #This is in case the login values have not been added already
-    if name == "stream_id_2":
-        Stream_ID_2 = plotpressure()
-        return Stream_ID_2
-    else:
-        value = raw_input('What is your %s?  ' %name)
-        parser.set(section,name,value)
+    value = raw_input('What is your %s?  ' %name)
+    parser.set(section,name,value)
 
 def Plotter():
     trace1 = Scatter(
