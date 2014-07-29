@@ -58,7 +58,7 @@ def Plotter():
     )
     my_data = Data([trace1, trace2])
     my_layout = Layout(
-        title='Temperature Readings from SheffieldPiStation',
+        title='Weather Readings from SheffieldPiStation',
         xaxis={'title':'Date and Time, GMT'},
         yaxis=YAxis(title='Temperature, *C',
                     range = [23,25]
