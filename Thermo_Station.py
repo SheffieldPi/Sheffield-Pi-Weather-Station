@@ -57,11 +57,9 @@ def Plotter():
         title='Weather Readings from SheffieldPiStation',
         xaxis={'title':'Date and Time, GMT'},
         yaxis=YAxis(title='Temperature, *C',
-                    range = [23,25]
         ),
         yaxis2=YAxis(
             title = 'Pressure, Pa',
-            range = [100500,100600],
             titlefont={'color':'rgb(148,103,189'},
             tickfont=Font(
                 color='rgb(148,103,189)'
