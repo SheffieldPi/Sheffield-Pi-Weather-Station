@@ -27,6 +27,46 @@ def Timeformatting(aTime):
     Timenow = time.strftime('%Y-%m-%d %H:%M:%S',aTime)
     Timeformat = Timenow.replace(':','%3A').replace(' ','+')
     return Timeformat,Timenow
+    
+def Plotter(group):
+    trace1 = Scatter(
+    x=[],
+    y=[],
+    name = 'Temperature Readings *C',
+    stream = Stream(token = Stream_ID,
+        maxpoints=80)
+    )
+    trace2 = Scatter(
+    x=[],
+    y=[],
+    name = 'Pressure Readings Pa',
+    yaxis = 'y2',
+    stream = Stream(token = Stream_ID_2,
+        maxpoints=80)
+    )
+    my_data = Data([trace1, trace2])
+    my_layout = Layout(
+        title=('Weather Readings from %s' % group),
+        xaxis={'title':'Date and Time, GMT'},
+        yaxis=YAxis(title='Temperature, *C',
+                    range = [23,25]
+        ),
+        yaxis2=YAxis(
+            title = 'Pressure, Pa',
+            range = [100500,100600],
+            titlefont={'color':'rgb(148,103,189'},
+            tickfont=Font(
+                color='rgb(148,103,189)'
+            ),
+            side = 'right',
+            overlaying = 'y'
+        )
+    )
+    my_fig = Figure(data = my_data,layout = my_layout)
+    unique_url = py.plot(my_fig,filename=('Festival of the Mind Group %s' % group),auto_open=False,fileopt='extend')
+    s = py.Stream(Stream_ID)
+    q = py.Stream(Stream_ID_2)
+    return s,q
 
 def addvalue():
     #This is in case the login values have not been added already
@@ -50,9 +90,21 @@ parser.write(open('details.ini','w'))
 #This assigns the values to a format that the code can now access
 AWSKey = parser.get('MetWOW','AWS_Key')
 SiteID = parser.get('MetWOW','Site_ID')
+APIKey = parser.get('Plotly','api_key')
+Stream_ID = parser.get('Plotly','stream_id')
+Username = parser.get('Plotly','username')
+Stream_ID_2 = parser.get('Plotly','stream_id_2')
 
 sensor = BMP085.BMP085()
 softwaretype = "Sheffield-Pi-Weather-Station-0.1"
+
+while True:
+    group = raw_input("What group number are you? ")
+    if float(group) != 1 or float(group) ! = 2 or float(group) != 3:
+        print "Sorry, I don't know that group!/n"
+        continue
+    else:
+        break
 
 #Read the data
 temp= format(sensor.read_temperature())
@@ -66,7 +118,7 @@ if 30> float(temp) >= 25:
 elif 15 <= float(temp) < 25:
     print "That's about average temperature!"
 elif float(temp) >=30:
-    print "That's very warm. Are you warming it up with your hand? Don't try to trick me!"
+    print "That's really warm. Are you warming it up with your hand? Don't try to trick me!"
 else:
     print "It's pretty chilly where you are!"
 #Get the data in the right units to upload
@@ -83,3 +135,13 @@ if float(response) == 200:
     print "You've uploaded your data to WOW!"
 else:
     print "There was an error connecting to WOW"
+
+#Sign in to Plot.ly, upload the data, and close the graphs to preserve the data
+py.sign_in(Username,APIKey)
+s,q = Plotter(group)
+s.open()
+q.open()
+s.write(dict(x=Timenow,y=temp))
+q.write(dict(x=Timenow,y=pressure))
+s.close()
+q.close()
