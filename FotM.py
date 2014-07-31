@@ -8,6 +8,11 @@ import Adafruit_BMP.BMP085 as BMP085
 import urllib
 import urllib2
 
+#Import the plot.ly data
+import plotly.plotly as py
+import plotly.tools as tls
+from plotly.graph_objs import *
+
 #Import the config data
 from ConfigParser import SafeConfigParser
 import sys
@@ -98,13 +103,14 @@ Stream_ID_2 = parser.get('Plotly','stream_id_2')
 sensor = BMP085.BMP085()
 softwaretype = "Sheffield-Pi-Weather-Station-0.1"
 
+#Check for group number to create a unique plot
 while True:
     group = raw_input("What group number are you? ")
-    if float(group) != 1 or float(group) ! = 2 or float(group) != 3:
+    if group == "1" or group == "2" or group == "3":
+        break
+    else:
         print "Sorry, I don't know that group!/n"
         continue
-    else:
-        break
 
 #Read the data
 temp= format(sensor.read_temperature())
@@ -121,6 +127,7 @@ elif float(temp) >=30:
     print "That's really warm. Are you warming it up with your hand? Don't try to trick me!"
 else:
     print "It's pretty chilly where you are!"
+
 #Get the data in the right units to upload
 Temp = tempfarenheit(temp)
 Pres = presinches(pressure)
