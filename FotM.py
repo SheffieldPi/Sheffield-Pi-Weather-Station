@@ -152,3 +152,4 @@ s.write(dict(x=Timenow,y=temp))
 q.write(dict(x=Timenow,y=pressure))
 s.close()
 q.close()
+print "You've uploaded your data to Plot.ly as well!"
