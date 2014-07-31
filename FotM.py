@@ -109,7 +109,7 @@ while True:
     if group == "1" or group == "2" or group == "3":
         break
     else:
-        print "Sorry, I don't know that group!/n"
+        print "Sorry, I don't know that group!\n"
         continue
 
 #Read the data
