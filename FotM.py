@@ -148,8 +148,12 @@ py.sign_in(Username,APIKey)
 s,q = Plotter(group)
 s.open()
 q.open()
-s.write(dict(x=Timenow,y=temp))
-q.write(dict(x=Timenow,y=pressure))
+x=0
+while x<2:
+    s.write(dict(x=Timenow,y=temp))
+    q.write(dict(x=Timenow,y=pressure))
+    x+=1
+    time.sleep(3)
 s.close()
 q.close()
 print "You've uploaded your data to Plot.ly as well!"
